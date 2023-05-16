@@ -1,0 +1,23 @@
+{
+  "semi": false,
+  "trailingComma": "none",
+  "singleQuote": true,
+  "jsxSingleQuote": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "printWidth": 120,
+  "arrowParens": "avoid",
+  "parser": "typescript",
+  "endOfLine": "auto",
+  "bracketSpacing": true,
+  "overrides": [
+    {
+      "files": ["**/*.ts", "**/*.tsx"],
+      "options": {
+        "parser": "typescript",
+        "singleQuote": true,
+        "semi": false
+      }
+    }
+  ]
+}
