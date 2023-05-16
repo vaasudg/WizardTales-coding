@@ -1,0 +1,1 @@
+export const BASE_ROUTER = (router: string): string => `/api/${router}/v1`

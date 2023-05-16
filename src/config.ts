@@ -4,14 +4,14 @@ import dotenv from 'dotenv'
 dotenv.config({})
 
 class Config {
-    constructor() { }
+  constructor() {}
 
-    public logger(name: string): bunyan {
-        return bunyan.createLogger({
-            name,
-            level: 'debug'
-        })
-    }
+  public logger(name: string): bunyan {
+    return bunyan.createLogger({
+      name,
+      level: 'debug'
+    })
+  }
 }
 
 export const config: Config = new Config()
