@@ -4,7 +4,11 @@ import dotenv from 'dotenv'
 dotenv.config({})
 
 class Config {
-  constructor() {}
+  public PORT: string | undefined
+
+  constructor() {
+    this.PORT = process.env.PORT || ''
+  }
 
   public logger(name: string): bunyan {
     return bunyan.createLogger({

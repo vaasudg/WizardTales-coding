@@ -5,7 +5,9 @@
 }
 table {
   border-collapse: collapse;
-  width: 100%;
+  width: 90%;
+  margin: 10px auto;
+  table-layout: fixed;
 }
 
 th,
@@ -35,6 +37,11 @@ tr:nth-child(even) {
   padding-top: 20px;
   width: 90%;
   margin: auto;
+}
+.form-container form label {
+  padding-bottom: 10px;
+  display: block;
+  color: #838282;
 }
 
 .form-container input[type='text'] {

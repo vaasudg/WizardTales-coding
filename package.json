@@ -6,6 +6,7 @@
     "node": ">=18.x",
     "npm": ">=8.x"
   },
+  "type": "commonjs",
   "scripts": {
     "start": "node ./build/app.js | ./node_modules/.bin/bunyan",
     "dev": "nodemon src/app.ts | ./node_modules/.bin/bunyan",
@@ -22,6 +23,7 @@
     "@types/bunyan": "^1.8.8",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/node-fetch": "^2.6.4",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "eslint": "^8.38.0",
@@ -32,13 +34,13 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "bunyan": "^1.8.15",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "http-status-codes": "^2.2.0",
-    "node-fetch": "^3.3.1",
     "ts-patch": "^2.1.0",
     "typescript-transform-paths": "^3.4.6"
   }

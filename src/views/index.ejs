@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>W</title>
+    <title>WizardTales's coding test</title>
     <link href="styles/index.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -13,8 +13,6 @@
         <form method="post">
             <label for="name">Enter the repo name:</label>
             <input type="text" id="name" name="name" placeholder="ex: https://github.com/rust-lang/rust">
-            <label for="keyword">Enter the keyword:</label>
-            <input type="text" id="email" name="keyword" placeholder="ex: license, copyright">
             <input type="submit" value="Submit">
         </form>
     </div>
@@ -24,13 +22,16 @@
             <th>Open Source License</th>
             <th>Copyright</th>
         </tr>
-        <% for (let i = 0; i < files.length; i++) { %>
+        <%= JSON.stringify(files) %>
+        <% /* %><% */ %>
+            <% for (let i = 0; i < files.length; i++) { %>
         <tr>
-            <td><%= files[i].name %><%= files[i].type === 'folder' ? '/' : '' %></td>
-            <td><%= files[i].license %></td>
-            <td><%= files[i].copyright %></td>
+            <td onclick="getData(event)" data-url=<%= files[i]?.link %>><%= files[i]?.name %><%= files[i]?.type === 'dir' ? '/' : '' %></td>
+            <td><%= files[i]?.license %></td>
+            <td><%= files[i]?.value %></td>
         </tr>
         <% } %>
+         
     </table>
     <script src="scripts/index.js"></script>
 </body>
