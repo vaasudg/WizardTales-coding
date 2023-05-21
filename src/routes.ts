@@ -1,9 +1,8 @@
-import { Application } from 'express'
-import { ScanFiles } from './utils/helpers';
+import { Application, Request, Response } from 'express'
+import { ScanFiles } from './utils/helpers'
 
 export const homeRouter = (app: Application) => {
-    app.get("/", async (req: any, res) => {
-
+    app.get('/', async (req: Request, res: Response) => {
         try {
             // const files = await ScanFiles.prototype.startScan('https://github.com/rust-lang/rust', 'Copyright (C)')
             const files = await ScanFiles.prototype.startScan('https://github.com/rust-lang/rust', 'Copyright (C)')
@@ -14,12 +13,18 @@ export const homeRouter = (app: Application) => {
             //     { name: 'File 2.txt', type: 'file', license: 'BSD 3-Clause License', copyright: '2023' },
             // ];
 
-            res.render("index", {
+            res.render('index', {
                 files: files.filter(Boolean)
-            });
+            })
         } catch (error) {
             console.log({ error })
         }
+    })
 
-    });
-};
+    app.post('/readDir', async (req: Request, res: Response) => {
+        const { url } = req.body
+        const dir = await ScanFiles.prototype.readDir(url, 'Copyright (C)')
+
+        res.json({ Pmsg: 'Helloo....', dir: dir.filter(Boolean) })
+    })
+}
