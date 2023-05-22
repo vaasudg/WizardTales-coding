@@ -6,51 +6,49 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WizardTales's coding test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="styles/index.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-    <div class="form-container">
+    <div class="loader">
+        <i class="fa-solid fa-gear"></i>
+    </div>
+    <!-- <div class="form-container">
         <form method="post">
             <label for="name">Enter the repo name:</label>
             <input type="text" id="name" name="name" placeholder="ex: https://github.com/rust-lang/rust">
             <input type="submit" value="Scan">
         </form>
-    </div>
-    <div>
+    </div> -->
+    <% /* %> 
+    <% console.log(files) %>
+    <% */ %>
+    
 
-        <ul style="display: flex; background-color: #e54363; color: aliceblue;">
+    <div class="list">
+        <ul class="list-header">
             <li>File tree</li>
             <li>Open Source License</li>
             <li>Copyright</li>
         </ul>
-        <% for (let i = 0; i < files.length; i++) { %>
-        <ul style="display: flex;" >
-            <li style="color: aqua;" class="parent" onclick="getData(event)"  data-url=<%= files[i]?.link %>><%= files[i]?.name %><%= files[i]?.type === 'dir' ? '/' : '' %> -- 
-            
-            </li>
-            <li style="color: red;"><%= files[i]?.license %> -- </li>
-            <li style="color: blueviolet;"><%= files[i]?.value %> -- </li>
-        </ul>
-        <% } %>
-    </div>
-    <% /* %>
-    <table>
-        <tr>
-            <th>File Tree</th>
-            <th>Open Source License</th>
-            <th>Copyright</th>
-        </tr>
-        <%= JSON.stringify(files) %>
-        <% for (let i = 0; i < files.length; i++) { %>
-            <tr>
-                <td onclick="getData(event)" data-url=<%= files[i]?.link %>><%= files[i]?.name %><%= files[i]?.type === 'dir' ? '/' : '' %></td>            
-                <td><%= files[i]?.license %></td>
-                <td><%= files[i]?.value %></td>
-            </tr>
+        <div class="list-body">
+            <% for (let i = 0; i < files?.length; i++) { %>
+                <ul>
+                    <li 
+                        onclick="getData(event)" 
+                        class="<%= files[i]?.type === 'dir' ? 'dir' : 'file' %> <%= files[i]?.isKeyword ? 'bold' : '' %> "
+                        data-url=<%= files[i]?.link %>
+                    >
+                         <i class="fa fa-light<%= files[i]?.type === 'dir' ? ' fa-folder' : ' fa-file' %>"></i>
+                        <%= files[i]?.name %><%= files[i]?.type === 'dir' ? '/' : '' %>
+                    </li>
+                    <li class="license"><%= files[i]?.license %></li>
+                    <li class="copyright"><%= files[i]?.value %></li>
+                </ul>
             <% } %>
-            
-        </table>
-        <% */ %>
+        </div>
+    </div>
+    <% /* %> --- <% */ %>
     <script src="scripts/index.js"></script>
 </body>
 </html>

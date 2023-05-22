@@ -1,17 +1,18 @@
-import axios from 'axios'
+import axios, { ResponseType } from 'axios'
 import url from 'url'
 import { spawn } from 'child_process'
 import { Logs } from './constants'
+import { ServiceCall } from './services'
 const { log } = new Logs('helper')
 
-interface ScanFilesForKeywordI {
-    directoryPath: string
-    keyword: string
-    callback?: Function
-}
-type PathnameI = {
-    owner: string[]
-    rep: string[]
+const { get, post } = new ServiceCall()
+
+interface ScanFilesI {
+    directoryPath: string,
+    keyword: string,
+    repoUrl?: string,
+    responseType?: ResponseType,
+    callback?: ((data: any) => boolean) | undefined
 }
 
 export class ClipBoard {
@@ -29,88 +30,68 @@ export class ClipBoard {
 export class ScanFiles {
     constructor() { }
 
-    // public async startScan(data: ScanFilesForKeywordI): Promise<void> {
+    /**
+      * Recursively scans the directory and its subdirectories to search for a keyword in files.
+      * @param directoryPath The path of the directory to scan.
+      * @param keyword The keyword to search for in the files.
+      * @param repoUrl The URL of the repository.
+      * @param responseType The response type for API requests.
+      * @param callback Optional callback function for handling the results.
+      * @returns An array of objects representing files matching the keyword.
+      */
     public async startScan(
-        directoryPath: string,
-        keyword: string,
-        callback?: ((data: any) => boolean) | undefined
+        options: ScanFilesI
     ): Promise<any> {
+        const { directoryPath, keyword, repoUrl, responseType, callback } = options;
         const { pathname, protocol, host } = url.parse(directoryPath)
         const [author, repo]: any = pathname?.split('/').slice(1, 3)
-        const apiUrl = `${protocol}//api.${host}/repos/${author}/${repo}/contents`
+        const apiUrl = repoUrl ? repoUrl : `${protocol}//api.${host}/repos/${author}/${repo}/contents`
 
-        // console.log({ apiUrl })
         try {
-            const { data } = await axios.get(apiUrl, {
-                headers: {
-                    Authorization: 'Bearer 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',
-                    Accept: 'application/vnd.github+json',
-                    'X-GitHub-Api-Version': '2022-11-28'
-                }
-            })
-            // ClipBoard.prototype.copy(JSON.stringify(data))
-            return await Promise.all<void>(
-                // const results = await Promise.all<void>(
+            const { data } = await get(apiUrl)
 
-                data.map(async (item: any) => {
-                    if (item.type === 'dir') {
-                        // return this.startScan(`${directoryPath}/${itemPath}`, keyword);
-                    }
+            // ClipBoard.prototype.copy(JSON.stringify(data))
+
+            return await Promise.all<void>(
+                data?.map(async (item: any) => {
 
                     const itemPath = decodeURIComponent(item.path)
+                    const responseType: ResponseType = item.type === 'file' ? 'text' : 'json'
 
                     if (item.type === 'dir') {
+                        // Recursive call to scan subdirectories
+                        const subDirectoryResults = await this.startScan({
+                            directoryPath: item?.url,
+                            keyword,
+                            repoUrl: item.url,
+                            responseType,
+                        })
                         return {
                             name: item.name,
                             type: item.type,
-                            link: item.url
+                            link: item.url,
+                            isKeyword: subDirectoryResults?.some(
+                                (result: any) => result?.value?.includes(keyword)
+                            ),
                         }
-                        // return {
-                        // }
-                        // const { data } = await axios.get(item.download_url, {
-                        //     responseType: 'text', headers: {
-                        //         Authorization: 'Bearer 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',
-                        //         Accept: 'application/vnd.github+json',
-                        //         'X-GitHub-Api-Version': '2022-11-28'
-                        //     }
-                        // })
-                        // // console.log({ data })
-                        // const lines = data.split('\n');
-                        // for (let i = 0; i < lines.length; i++) {
-                        //     if (lines[i].includes(keyword)) {
-                        //         matches.push({
-                        //             itemPath,
-                        //             lineNumber: i + 1,
-                        //             value: lines[i].trim(),
-                        //         });
-                        //     }
-                        // }
-                        // return
-                        // return {
-                        //     name: item.name,
-                        //     type: item.type,
-                        //     // ...matches
-                        // }
                     } else {
-                        const { data } = await axios.get(item.download_url, {
-                            responseType: 'text',
-                            headers: {
-                                Authorization: 'Bearer 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',
-                                Accept: 'application/vnd.github+json',
-                                'X-GitHub-Api-Version': '2022-11-28'
-                            }
-                        })
+                        const { data } = await get(item.download_url)
                         const lines = data.split('\n')
                         const matches = []
+
+                        // Search for keyword in each line of the file
                         for (let i = 0; i < lines.length; i++) {
                             if (lines[i].includes(keyword)) {
                                 matches.push({
-                                    name: itemPath,
+                                    name: item.name,
                                     lineNumber: i + 1,
                                     value: lines[i].trim(),
+                                    type: item.type,
                                 })
                             }
                         }
+
+                        // Return the first match or null if no matches
                         return matches.length ? matches[0] : null
                     }
                 })
@@ -123,105 +104,4 @@ export class ScanFiles {
             // callback(error)
         }
     }
-
-    public async readDir(apiUrl: string, keyword: string): Promise<any> {
-        try {
-            const { data } = await axios.get(apiUrl, {
-                headers: {
-                    Authorization: 'Bearer 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',
-                    Accept: 'application/vnd.github+json',
-                    'X-GitHub-Api-Version': '2022-11-28'
-                }
-            })
-            return await Promise.all<void>(
-                // const results = await Promise.all<void>(
-
-                data.map(async (item: any) => {
-                    if (item.type === 'dir') {
-                        // return this.startScan(`${directoryPath}/${itemPath}`, keyword);
-                    }
-
-                    const itemPath = decodeURIComponent(item.path)
-
-                    if (item.type === 'dir') {
-                        return {
-                            name: item.name,
-                            type: item.type,
-                            link: item.url
-                        }
-
-                    } else {
-                        const { data } = await axios.get(item.download_url, {
-                            responseType: 'text',
-                            headers: {
-                                Authorization: 'Bearer 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',
-                                Accept: 'application/vnd.github+json',
-                                'X-GitHub-Api-Version': '2022-11-28'
-                            }
-                        })
-                        const lines = data.split('\n')
-                        const matches = []
-                        for (let i = 0; i < lines.length; i++) {
-                            if (lines[i].includes(keyword)) {
-                                matches.push({
-                                    name: itemPath,
-                                    lineNumber: i + 1,
-                                    value: lines[i].trim(),
-                                })
-                            }
-                        }
-                        return matches.length ? matches[0] : null
-                    }
-                })
-            )
-            return data
-        } catch (error) {
-
-        }
-    }
 }
-// async function scanFilesForKeyword(directoryPath, keyword, callback) {
-//     const { pathname, protocol, host } = url.parse(directoryPath);
-//     const [owner, repo] = pathname.split('/').slice(1, 3);
-
-//     const apiUrl = `${protocol}//api.${host}/repos/${owner}/${repo}/contents`;
-
-//     try {
-//         const response = await fetch(apiUrl);
-//         const contents = await response.json();
-
-//         const results = await Promise.all(
-//             contents.map(async (item) => {
-//                 const itemPath = decodeURIComponent(item.path);
-
-//                 if (item.type === 'dir') {
-//                     return scanFilesForKeyword(`${directoryPath}/${itemPath}`, keyword);
-//                 }
-
-//                 if (path.extname(itemPath) !== '.js') {
-//                     return null;
-//                 }
-
-//                 const fileUrl = item.download_url;
-//                 const fileContent = await fetch(fileUrl).then((res) => res.text());
-//                 const lines = fileContent.split('\n');
-//                 const matches = [];
-
-//                 for (let i = 0; i < lines.length; i++) {
-//                     if (lines[i].includes(keyword)) {
-//                         matches.push({
-//                             filePath: `${directoryPath}/${itemPath}`,
-//                             lineNumber: i + 1,
-//                         });
-//                     }
-//                 }
-
-//                 return matches.length ? matches : null;
-//             })
-//         );
-
-//         callback(null, results.filter((result) => result !== null).flat());
-//     } catch (err) {
-//         callback(err);
-//     }
-// }
